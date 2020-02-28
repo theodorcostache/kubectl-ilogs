@@ -1,0 +1,6 @@
+kubernetes==11.0.0b2
+argparse
+cython
+pytest
+coverage
+urllib3<1.25

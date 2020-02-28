@@ -1,0 +1,8 @@
+.env/
+.vscode/
+ilogs.c
+kubectl-ilogs
+__pycache__/
+.pytest_cache/
+htmlcov/
+.coverage
