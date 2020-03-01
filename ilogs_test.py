@@ -1,49 +1,26 @@
 import ilogs
-import types
+from types import SimpleNamespace
 import pytest
 from unittest import mock  
 import argparse
 import kubernetes
 
-FakePod = types.SimpleNamespace
-FakePodSpec = types.SimpleNamespace
-FakePodMetadata = types.SimpleNamespace
-FakePodContainer = types.SimpleNamespace
-FakePodSearchResponse = types.SimpleNamespace
-
+##############################################################################
+# Fixtures
+##############################################################################
 POD_NAMES = ['test-pod-1','test-pod-2','test-pod-3','test-pod-4']
 POD_NAMESPACE = 'test-namespace'
 POD_CONTAINER_NAMES = ['container1', 'container2']
 POD_INIT_CONTAINER_NAMES = ['init-container1', 'init-container2']
 
-##############################################################################
-# Helper functions
-##############################################################################
 def create_fake_pod(pod_name, pod_namespace, pod_containers, pod_init_containers):
-    fake_pod = FakePod()
-    fake_pod.metadata = FakePodMetadata(name=pod_name, namespace=pod_namespace)
-    fake_pod.spec = FakePodSpec()
-    fake_pod.spec.containers = [ FakePodContainer(name=name) for name in pod_containers]
-    fake_pod.spec.init_containers = [ FakePodContainer(name=name) for name in pod_init_containers]
+    fake_pod = SimpleNamespace()
+    fake_pod.metadata = SimpleNamespace(name=pod_name, namespace=pod_namespace)
+    fake_pod.spec = SimpleNamespace()
+    fake_pod.spec.containers = [ SimpleNamespace(name=name) for name in pod_containers]
+    fake_pod.spec.init_containers = [ SimpleNamespace(name=name) for name in pod_init_containers]
     
     return fake_pod
-
-def fake_load_config():
-    pass
-
-def create_fake_input(result):
-    def fake_input(prompt):
-        print(prompt)
-        for e in result:
-            if prompt == e[0]:
-                return e[1]
-        return None
-    
-    return fake_input
-
-##############################################################################
-# Fixtures
-##############################################################################
 
 @pytest.fixture
 def fake_pods():
@@ -54,10 +31,18 @@ def fake_pods():
     return fake_pods
 
 ##############################################################################
-# Test Scenarios
+# Scenario
 ##############################################################################
 class Scenario:
-    def __init__(self, pod_regex, pod_namespace_regex, pods, expected_output, log=None, pod_selection=None, container_selection=None, expected_exit_code=0, ):
+    def __init__(self, 
+                 pod_regex, 
+                 pod_namespace_regex, 
+                 pods, 
+                 expected_output, 
+                 expected_exit_code=0,
+                 log=None, 
+                 pod_selection=None, 
+                 container_selection=None):
         self.pod_regex = pod_regex
         self.pod_namespace_regex = pod_namespace_regex
         self.pods = pods
@@ -66,10 +51,23 @@ class Scenario:
         self.container_selection = container_selection
         self.expected_exit_code = expected_exit_code
         self.expected_output = expected_output
+        
+    
+    def __noop_load_config(self):
+        pass
+        
+    def __create_fake_input(self, result):
+        def fake_input(prompt):
+            print(prompt)
+            for e in result:
+                if prompt == e[0]:
+                    return e[1]
+            return None
+        return fake_input
     
     def execute(self, monkeypatch, capsys):
         
-        ilogs.input = create_fake_input([self.pod_selection, self.container_selection])
+        ilogs.input = self.__create_fake_input([self.pod_selection, self.container_selection])
         
         pod_selection = None
         selected_pod_index = -1
@@ -86,7 +84,7 @@ class Scenario:
         
         monkeypatch.setattr(kubernetes.client.CoreV1Api, 
                             "list_pod_for_all_namespaces", 
-                            mock.MagicMock(return_value=FakePodSearchResponse(items=self.pods)))
+                            mock.MagicMock(return_value=SimpleNamespace(items=self.pods)))
         
         monkeypatch.setattr(kubernetes.client.CoreV1Api, 
                             "read_namespaced_pod", 
@@ -96,7 +94,7 @@ class Scenario:
                             "read_namespaced_pod_log", 
                             mock.MagicMock(return_value=self.log))
                                 
-        monkeypatch.setattr(kubernetes.config, "load_kube_config", fake_load_config)
+        monkeypatch.setattr(kubernetes.config, "load_kube_config", self.__noop_load_config)
     
         with mock.patch.object(ilogs, "__name__", "__main__"):
             with mock.patch.object(ilogs,'exit') as mock_exit:
@@ -108,7 +106,10 @@ class Scenario:
         
         assert captured.out == self.expected_output    
     
-    
+
+##############################################################################
+# Tests
+##############################################################################   
 def test_no_pod_found(monkeypatch, capsys, fake_pods):
     
     test_scenario = Scenario(pod_regex=".*[5]",
