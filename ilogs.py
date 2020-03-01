@@ -69,7 +69,7 @@ def get_containers(client, pod, namespace):
         
     return containers
 
-def prompt_selection(values, prompt, print_callback=(lambda e: e)):
+def prompt_selection(values, prompt, print_template, headers):
     """
     displays the list of available values with a corresponding id and prompts the user to select one
 
@@ -80,9 +80,11 @@ def prompt_selection(values, prompt, print_callback=(lambda e: e)):
     
     values_length = len(values)
      
+    print(print_template.format(*headers))
     for id, value in enumerate(values, start=1):
-        print(f"{id}: {print_callback(value)}")
-    
+        output = (print_template.format(id, *value) if isinstance(value, tuple) else print_template.format(id, value))
+        print(output)
+        
     value_id = int(input(f"{prompt} (1,{values_length}): "))
     
     if value_id not in range(1, values_length+1):
@@ -119,7 +121,7 @@ def main():
             (pod, namespace) = pods[0]
         else:
             (pod, namespace) = prompt_selection(pods, 'Multiple pods match your search criteria. Please select one', 
-                                                (lambda e: f"pod: {e[0]} namespace: {e[1]}"))
+                                                "{:<6}{:<60}{:<15}", ['NR.', 'POD', 'NAMESPACE'])
         
         containers = get_containers(clientV1, pod, namespace)
         
@@ -128,7 +130,7 @@ def main():
         elif len(containers) == 1:
             container = containers[0]
         else:
-            container = prompt_selection(containers, 'Please select container')
+            container = prompt_selection(containers, 'Please select container', "{:<6}{:<50}", ['NR.', 'CONTAINER'])
         
         logs = get_logs(clientV1, pod, namespace, container)
         

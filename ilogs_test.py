@@ -130,9 +130,10 @@ def test_invalid_pod_selection(monkeypatch, capsys, fake_pods):
                        container_selection=('Please select container (1,4): ', '1'),
                        expected_exit_code=1,
                        expected_output=(
-                           "1: pod: test-pod-1 namespace: test-namespace\n" +
-                           "2: pod: test-pod-2 namespace: test-namespace\n" +
-                           "3: pod: test-pod-3 namespace: test-namespace\n" +
+                           "NR.   POD                                                         NAMESPACE      \n" +
+                           "1     test-pod-1                                                  test-namespace \n" +
+                           "2     test-pod-2                                                  test-namespace \n" +
+                           "3     test-pod-3                                                  test-namespace \n" +
                            "Multiple pods match your search criteria. Please select one (1,3): \n" +
                            "Please enter a valid selection (1,3)\n"))
     
@@ -148,14 +149,16 @@ def test_invalid_container_selection(monkeypatch, capsys, fake_pods):
                        container_selection=('Please select container (1,4): ', '5'),
                        expected_exit_code=1,
                        expected_output=(
-                           "1: pod: test-pod-1 namespace: test-namespace\n" +
-                           "2: pod: test-pod-2 namespace: test-namespace\n" +
-                           "3: pod: test-pod-3 namespace: test-namespace\n" +
+                           "NR.   POD                                                         NAMESPACE      \n" +
+                           "1     test-pod-1                                                  test-namespace \n" +
+                           "2     test-pod-2                                                  test-namespace \n" +
+                           "3     test-pod-3                                                  test-namespace \n" +
                            "Multiple pods match your search criteria. Please select one (1,3): \n" +
-                           "1: container1\n" +
-                           "2: container2\n" +
-                           "3: init-container1\n" +
-                           "4: init-container2\n" +
+                           "NR.   CONTAINER                                         \n"
+                           "1     container1                                        \n" +
+                           "2     container2                                        \n" +
+                           "3     init-container1                                   \n" +
+                           "4     init-container2                                   \n" +
                            "Please select container (1,4): \n" +
                            "Please enter a valid selection (1,4)\n"))
     
@@ -197,14 +200,17 @@ def test_multiple_pods_with_multiple_containers(monkeypatch, capsys, fake_pods):
                        container_selection=('Please select container (1,4): ', '1'),
                        expected_exit_code=0,
                        expected_output=(
-                           "1: pod: test-pod-1 namespace: test-namespace\n" +
-                           "2: pod: test-pod-2 namespace: test-namespace\n" +
+                           "NR.   POD                                                         NAMESPACE      \n" +
+                           "1     test-pod-1                                                  test-namespace \n" +
+                           "2     test-pod-2                                                  test-namespace \n" +
                            "Multiple pods match your search criteria. Please select one (1,2): \n" +
-                           "1: container1\n" +
-                           "2: container2\n" +
-                           "3: init-container1\n" +
-                           "4: init-container2\n" +
+                           "NR.   CONTAINER                                         \n"
+                           "1     container1                                        \n" +
+                           "2     container2                                        \n" +
+                           "3     init-container1                                   \n" +
+                           "4     init-container2                                   \n" +
                            "Please select container (1,4): \n" +
-                           "fake log test\n"))
+                           "fake log test\n"
+                           ))
     
     test_scenario.execute(monkeypatch, capsys)
