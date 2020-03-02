@@ -6,10 +6,26 @@ It supports pattern matching with regular expressions and works by displaying a 
 
 ![](demo.gif)
 
+## Dependencies
+
+To use the extension, the following packages have be installed:
+
+For Ubuntu:
+
+```
+sudo apt-get update && sudo apt-get install -y python3 python3-dev python3-pip
+```
+
+For CentOS:
+
+```
+sudo yum -y install gcc python3 python3-devel python3-pip
+```
+
 ## Installation
 
 To install the extension use the following command:
 
 ```
-./install.sh
+sudo ./install.sh
 ```

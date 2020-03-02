@@ -1,0 +1,17 @@
+FROM ubuntu:18.04
+
+WORKDIR /app
+
+COPY ilogs.py .
+COPY ilogs_test.py .
+COPY requirements.txt .
+COPY install.sh .
+
+RUN apt-get update
+RUN apt-get install -y python3 python3-dev python3-pip
+
+RUN ./install.sh
+
+WORKDIR /usr/local/bin
+
+CMD ./kubectl-ilogs

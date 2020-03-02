@@ -1,0 +1,16 @@
+FROM centos:7
+
+WORKDIR /app
+
+COPY ilogs.py .
+COPY ilogs_test.py .
+COPY requirements.txt .
+COPY install.sh .
+
+RUN yum -y install gcc python3 python3-devel python3-pip
+
+RUN ./install.sh
+
+WORKDIR /usr/local/bin
+
+CMD ./kubectl-ilogs
