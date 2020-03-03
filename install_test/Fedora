@@ -1,0 +1,17 @@
+FROM fedora:31
+
+WORKDIR /app
+
+COPY ilogs.py .
+COPY ilogs_test.py .
+COPY requirements.txt .
+COPY install.sh .
+
+RUN dnf -y update && \
+        dnf install -y findutils gcc python3 python3-devel python3-pip 
+        
+RUN ./install.sh
+
+WORKDIR /usr/local/bin
+
+CMD ./kubectl-ilogs

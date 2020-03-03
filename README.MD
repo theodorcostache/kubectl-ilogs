@@ -10,16 +10,22 @@ It supports pattern matching with regular expressions and works by displaying a 
 
 To use the extension, the following packages have be installed:
 
-For Ubuntu:
+For Ubuntu (tested with Ubuntu 18.04):
 
 ```
 sudo apt-get update && sudo apt-get install -y python3 python3-dev python3-pip
 ```
 
-For CentOS:
+For CentOS (tested with Centos 7):
 
 ```
 sudo yum -y install gcc python3 python3-devel python3-pip
+```
+
+For Fedora (tested with Fedora 31):
+
+```
+sudo dnf -y update && sudo dnf install -y findutils gcc python3 python3-devel python3-pip
 ```
 
 ## Installation
